@@ -1,0 +1,25 @@
+import java.util.EventObject;
+
+public class TicTacToeEvent extends EventObject {
+    private int x;
+    private int y;
+    private TicTacToeModel.Status status;
+    public TicTacToeEvent(TicTacToeModel ticTacToeModel, TicTacToeModel.Status status, int x, int y) {
+        super(ticTacToeModel);
+        this.status = status;
+        this.x = x;
+        this.y = y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY(){
+        return y;
+    }
+
+    public TicTacToeModel.Status getStatus() {
+        return status;
+    }
+}

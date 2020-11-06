@@ -1,4 +1,7 @@
-public class TicTacToe {
+import java.util.ArrayList;
+import java.util.List;
+
+public class TicTacToeModel {
 
 
     public static int SIZE = 3;
@@ -11,8 +14,10 @@ public class TicTacToe {
     private boolean turn;
     private Status status;
 
+    private List<TicTacToeView> ticTacToeViewList;
 
-    public TicTacToe() {
+
+    public TicTacToeModel() {
         grid = new char[SIZE][SIZE];
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
@@ -22,8 +27,16 @@ public class TicTacToe {
         turn = X;
         status = Status.UNDECIDED;
 
+        ticTacToeViewList = new ArrayList<>();
     }
 
+    public void addTicTacToeView(TicTacToeView ticTacToeView){
+        ticTacToeViewList.add(ticTacToeView);
+    }
+
+    public void removeTicTacToeView(TicTacToeView ticTacToeView){
+        ticTacToeViewList.remove(ticTacToeView);
+    }
 
     private void changeTurn() {
         turn = !turn;
@@ -32,13 +45,15 @@ public class TicTacToe {
     public Status getStatus() {return status;}
 
     private Status updateStatus() {
+
         boolean rowwin = false;
         boolean colwin = false;
-        boolean adjwin = false;
-        boolean reverAdjwin = false;
+        boolean diagonwin = false;
+        boolean reverDiagonwin = false;
+        boolean isFull = true;
 
-        int reverAdjcount = 0;
-        int adjcount = 0;
+        int reverDiagoncount = 0;
+        int diagoncount = 0;
 
         char checkwho = ' ';
         if(getTurn()){
@@ -59,7 +74,7 @@ public class TicTacToe {
                 if(rowcount == SIZE)
                     rowwin = true;
                 else
-                   rowwin = false;
+                    rowwin = false;
             }
 
         }
@@ -81,41 +96,38 @@ public class TicTacToe {
         }
         for (int i = 0; i < SIZE; i++) {
 
-                if (grid[i][i] == checkwho)
-                    adjcount++;
-                if (grid[i][SIZE-1-i] == checkwho)
-                    reverAdjcount++;
+            if (grid[i][i] == checkwho)
+                diagoncount++;
+            if (grid[i][SIZE-1-i] == checkwho)
+                reverDiagoncount++;
 
         }
-        if (adjcount == SIZE)
-            adjwin = true;
+        if (diagoncount == SIZE)
+            diagonwin= true;
 
-        if (reverAdjcount == SIZE)
-            reverAdjwin = true;
+        if (reverDiagoncount == SIZE)
+            reverDiagonwin = true;
 
 
-        if (rowwin||colwin||adjwin||reverAdjwin){
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (grid[i][j] ==' '){
+                    isFull = false;
+                }
+            }
+        }
+        if (rowwin||colwin||diagonwin||reverDiagonwin){
             if(getTurn())
                 status = Status.X_WON;
             else
                 status = Status.O_WON;
         }
-        else if (isFull())
+        else if (isFull)
             status = Status.TIE;
         else
             status = Status.UNDECIDED;
 
         return status; //TODO
-    }
-    public boolean isFull(){
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                if (grid[i][j] ==' '){
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     public boolean getTurn() {return turn;}
@@ -124,7 +136,7 @@ public class TicTacToe {
         if (grid[x][y] != ' ') return;
         grid[x][y] = turn? 'X' : 'O';
         updateStatus();
+        for(TicTacToeView ticTacToeView:ticTacToeViewList)ticTacToeView.handleTicTacToeUpdate(new TicTacToeEvent(this,status,x,y));
         changeTurn();
     }
 }
-
